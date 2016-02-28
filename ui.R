@@ -20,7 +20,7 @@ shinyUI(pageWithSidebar(
   mainPanel(
     h3('Results for Upper Inflation Only!'),
     h4('Forecast Method'), verbatimTextOutput("od2"),
-    h4('Using compounding interest, input inflated to'), verbatimTextOutput("od4"),
+    h4('Using compounding interest, dollar input inflated to'), verbatimTextOutput("od4"),
     h4('Years since 2014'), verbatimTextOutput("od3"),
     plotOutput('newPlot')
   )
