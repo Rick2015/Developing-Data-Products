@@ -1,0 +1,82 @@
+---
+title       : Developing Data Products
+subtitle    : Reproducible Pitch - Predict Inflation
+author      : Richard R.
+job         : 
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : []            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+---
+
+## Consumer Price Index (CPI)
+
+- This application is based on the CPI computed from 1978 to 2014 by the United States Bureau of Labor Statistics (BLS). 
+- There are different types of CPI algorithms that U.S. BLS has used over the years. This Shiny app is based on CPI-U for all urban consumers with a based/index period of 1982-1984=100.
+- The annual change of CPI-U is calculated by this Shiny app as a percentage to determine yearly U.S. Dollar inflation rates. 
+- Data Source: [Consumer Price Index (CPI-U)](http://www.bls.gov/cpi/)
+
+---
+
+## Application: Predict Inflation
+
+
+- The Predict Inflation is a Shiny app that uses the `forecast` library to predict future inflation rates. 
+- The app is inspired by the BLS [CPI Inflation Calculator](http://www.bls.gov/data/inflation_calculator.htm).
+- The app can help people predict the future cost of an expense using current dollar (2014) values.
+- At this time the app only uses the Upper inflation rate of the 99% confidence level.
+
+---
+
+## How the Application Works
+
+```{r,eval=FALSE}
+library(forecast)
+cpiUts <- ts(cpiU$Annual, start=c(1978), end=c(2014), frequency=1) #Time series obj of CPI-U
+cpiUper <- cpiUts/lag(cpiUts,-1) - 1                            #Annual inflation percentage
+cpiUperd <- rwf(cpiUper, h=30, drift=TRUE, level=c(80,99), fan=FALSE, lambda=NULL)#30yr forecast
+p<-1 #Pricipal amount $1 dollar (or user input)
+for(i in 1:30) {p <- as.numeric(p*cpiUperd$upper[i,2])+p} #RWF Upper 99% compound interest 30yr
+```
+
+- The user inputs a dollar amount, future year, and selects forecast method.
+- The app calculates compounding interest based on predicted year-by-year inflation.
+- The app output is future inflated dollar amount of that expense.
+
+Access:
+
+- [Shiny app - https://rick2015.shinyapps.io/Developing_Data_Products/](https://rick2015.shinyapps.io/Developing_Data_Products/)
+- [ui.R - https://github.com/Rick2015/Developing-Data-Products/blob/master/ui.R](https://github.com/Rick2015/Developing-Data-Products/blob/master/ui.R)
+- [server.r - https://github.com/Rick2015/Developing-Data-Products/blob/master/server.r](https://github.com/Rick2015/Developing-Data-Products/blob/master/server.r)
+
+---
+
+## How the Data Looks
+
+```{r, getdata, echo=FALSE}
+library(xlsx)
+library(forecast)
+
+cpiU <- read.xlsx("./SeriesReport-20160224001724_bf095b.xlsx", sheetName = "BLS Data Series", startRow = 11, header = TRUE, endRow = 51)
+cpiU <- cpiU[-1,] #Remove 1977 row to align with 1978 
+cpiUts <- ts(cpiU$Annual, start = c(1978), end = c(2014), frequency = 1) #Time series obj of yearly average
+
+cpiUper <- cpiUts/lag(cpiUts,-1) - 1    #Annual inflation
+
+x<-1
+for(i in 1:36) { x <- (x*cpiUper[i]) + x} #CPI-U compound interest to 2014
+cpiUperd <- rwf(cpiUper, h=30, drift = TRUE, level = c(80,99), fan = FALSE, lambda = NULL)#30 year forecast from Random Walk with drift
+
+c<-1 #Principal
+for(i in 1:30) {  c <- as.numeric(c*cpiUperd$upper[i,2]) + c } #Random Upper 99% compound interest 2015-2044 (30 years)
+
+par(mfrow=c(2,2))
+plot(cpiU$Year, cpiU$Annual, type = "l", col = "red", lwd = 3, xlab = "Years 1978-2014", ylab = "Index 1982-84=100", main = "Consumer Price Index (CPI-U)")
+ts.plot(cpiUper, gpars = list(col= c("red")), lwd=3, xlab = "Years 1978-2014", ylab = "Delta", main = "CPI-U Change as Percentage")
+plot(cpiUperd, xlab="Years 1978-2044", ylab="Delta", main = "Forecast with RWF Drift (2015-2044)")
+plot.new()
+text(0.5,0.5,as.character(paste0("User Input: 2044,RWF,$1\nApp Output: $", round(c, digits=2))), cex=1)
+```
+---

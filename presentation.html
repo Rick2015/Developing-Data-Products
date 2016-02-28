@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Developing Data Products</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Developing Data Products">
+  <meta name="author" content="Richard R.">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Developing Data Products</h1>
+    <h2>Reproducible Pitch - Predict Inflation</h2>
+    <p>Richard R.<br/></p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <hgroup>
+    <h2>Consumer Price Index (CPI)</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>This application is based on the CPI computed from 1978 to 2014 by the United States Bureau of Labor Statistics (BLS). </li>
+<li>There are different types of CPI algorithms that U.S. BLS has used over the years. This Shiny app is based on CPI-U for all urban consumers with a based/index period of 1982-1984=100.</li>
+<li>The annual change of CPI-U is calculated by this Shiny app as a percentage to determine yearly U.S. Dollar inflation rates. </li>
+<li>Data Source: <a href="http://www.bls.gov/cpi/">Consumer Price Index (CPI-U)</a></li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-2" style="background:;">
+  <hgroup>
+    <h2>Application: Predict Inflation</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>The Predict Inflation is a Shiny app that uses the <code>forecast</code> library to predict future inflation rates. </li>
+<li>The app is inspired by the BLS <a href="http://www.bls.gov/data/inflation_calculator.htm">CPI Inflation Calculator</a>.</li>
+<li>The app can help people predict the future cost of an expense using current dollar (2014) values.</li>
+<li>At this time the app only uses the Upper inflation rate of the 99% confidence level.</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-3" style="background:;">
+  <hgroup>
+    <h2>How the Application Works</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">library(forecast)
+cpiUts &lt;- ts(cpiU$Annual, start=c(1978), end=c(2014), frequency=1) #Time series obj of CPI-U
+cpiUper &lt;- cpiUts/lag(cpiUts,-1) - 1                            #Annual inflation percentage
+cpiUperd &lt;- rwf(cpiUper, h=30, drift=TRUE, level=c(80,99), fan=FALSE, lambda=NULL)#30yr forecast
+p&lt;-1 #Pricipal amount $1 dollar (or user input)
+for(i in 1:30) {p &lt;- as.numeric(p*cpiUperd$upper[i,2])+p} #RWF Upper 99% compound interest 30yr
+</code></pre>
+
+<ul>
+<li>The user inputs a dollar amount, future year, and selects forecast method.</li>
+<li>The app calculates compounding interest based on predicted year-by-year inflation.</li>
+<li>The app output is future inflated dollar amount of that expense.</li>
+</ul>
+
+<p>Access:</p>
+
+<ul>
+<li><a href="https://rick2015.shinyapps.io/Developing_Data_Products/">Shiny app - https://rick2015.shinyapps.io/Developing_Data_Products/</a></li>
+<li><a href="https://github.com/Rick2015/Developing-Data-Products/blob/master/ui.R">ui.R - https://github.com/Rick2015/Developing-Data-Products/blob/master/ui.R</a></li>
+<li><a href="https://github.com/Rick2015/Developing-Data-Products/blob/master/server.r">server.r - https://github.com/Rick2015/Developing-Data-Products/blob/master/server.r</a></li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-4" style="background:;">
+  <hgroup>
+    <h2>How the Data Looks</h2>
+  </hgroup>
+  <article data-timings="">
+    <h2><img src="assets/fig/getdata-1.png" alt="plot of chunk getdata"></h2>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='Consumer Price Index (CPI)'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Application: Predict Inflation'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='How the Application Works'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='How the Data Looks'>
+         4
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
