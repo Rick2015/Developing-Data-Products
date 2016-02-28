@@ -12,7 +12,10 @@ shinyUI(pageWithSidebar(
      h5('Data Source:'), 
      h6('Consumer Price Index (CPI-U) 1977-2014'),
      h6('U.S.Bureau of Labor Statistics (BLS)'),
-     h6('http://www.bls.gov/cpi/')
+     h6('http://www.bls.gov/cpi/'),
+     h3(''),
+     h5('Code Repository:'),
+     h6('https://github.com/Rick2015/Developing-Data-Products')
   ),
   mainPanel(
     h3('Results for Upper Inflation Only!'),
